@@ -1234,6 +1234,22 @@ function M.patchUIManagerClose(plugin)
                     -- reader is closing to open a *new* book — do NOT open the HS.
                     if not widget.tearing_down then
                         _hs_pending_after_reader = true
+                        -- Refresh the FM's file list lazily (after the HS is shown)
+                        -- so that sort order and cover status reflect any changes
+                        -- made during the reading session (e.g. marking a book as
+                        -- finished). In the standard KOReader flow, showFiles()
+                        -- creates a brand-new FM and its init() calls refreshPath().
+                        -- With SimpleUI the FM stays alive and never gets that
+                        -- automatic refresh, so we do it here. scheduleIn(0) defers
+                        -- the work until after the HS has opened, avoiding any delay
+                        -- on the transition back from the reader.
+                        UIManager:scheduleIn(0, function()
+                            local FM_ref = package.loaded["apps/filemanager/filemanager"]
+                            local fm_ref = FM_ref and FM_ref.instance
+                            if fm_ref and fm_ref.file_chooser then
+                                fm_ref.file_chooser:refreshPath()
+                            end
+                        end)
                     end
                 else
                     UIManager:scheduleIn(0, function()
