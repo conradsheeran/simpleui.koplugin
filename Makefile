@@ -1,31 +1,23 @@
 ZIP_NAME = simpleui.koplugin.zip
 ROOT_DIR = simpleui.koplugin
 
-.PHONY: clean build clean
+.PHONY: clean build
 
 build:
 	@echo ">> Building $(ZIP_NAME)"
-	@rm -f $(ZIP_NAME)
-	@mkdir -p $(ROOT_DIR)
-
-	# Copy everything except ignored items into ROOT_DIR
-	@rsync -av \
-		--exclude '.git' \
-		--exclude '.github' \
-		--exclude 'Makefile' \
-		--exclude '.DS_Store' \
-		--exclude '.gitignore' \
-		--exclude 'CONTRIBUTING.md' \
-		--exclude 'LICENSE' \
-		--exclude 'README.md' \
-		--exclude 'extract_strings.py' \
-		--exclude '$(ZIP_NAME)' \
-		./ $(ROOT_DIR)
-
-	# Zip the ROOT_DIR as the top-level folder
-	@zip -r $(ZIP_NAME) $(ROOT_DIR)
-
+	@rm -f ../$(ZIP_NAME)
+	@cd .. && zip -r $(ROOT_DIR)/$(ZIP_NAME) $(ROOT_DIR) \
+		--exclude "$(ROOT_DIR)/.git/*" \
+		--exclude "$(ROOT_DIR)/.github/*" \
+		--exclude "$(ROOT_DIR)/Makefile" \
+		--exclude "$(ROOT_DIR)/.DS_Store" \
+		--exclude "$(ROOT_DIR)/.gitignore" \
+		--exclude "$(ROOT_DIR)/CONTRIBUTING.md" \
+		--exclude "$(ROOT_DIR)/LICENSE" \
+		--exclude "$(ROOT_DIR)/README.md" \
+		--exclude "$(ROOT_DIR)/extract_strings.py" \
+		--exclude "$(ROOT_DIR)/$(ZIP_NAME)"
 	@echo ">> Done!"
 
 clean:
-	@rm -rf $(ROOT_DIR) $(ZIP_NAME)
+	@rm -f ../$(ZIP_NAME)
